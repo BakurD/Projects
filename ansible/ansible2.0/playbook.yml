@@ -1,0 +1,29 @@
+---
+- name: Vars
+  hosts: all
+  become: yes
+
+  vars:
+    mes1: Hi
+    mes2: All
+    secret: NBNBNFJOEKGCC
+
+  tasks:
+  - name: Print Secret Variable
+    debug:
+      var: secret
+  - debug:
+      msg: "Secret key:{{ secret }}"
+  - debug:
+      msg: "{{ mes1 }}, i will fisting {{ mes2 }}!!! ass at the world"
+  - set_fact: full_mes="{{ mes1 }} {{mes2}}"
+  - debug:
+      var: full_mes
+  - debug:
+      var: ansible_system
+
+  - shell: uptime
+    register: results
+
+  - debug:
+      var: results

@@ -1,0 +1,7 @@
+---
+- name: Create folder
+  file:
+   path: /home/secret/folder
+   state: directory
+   mode: 0755
+

@@ -1,0 +1,15 @@
+---
+- name: Create files
+  hosts: all
+  become: yes
+
+  vars:
+   mytext: "It`s my fucking text"
+
+
+  tasks:
+  - name: test ping
+    ping:
+
+  - include: create_folder.yml
+  - include: create_file.yml mytext="Hi Gay"

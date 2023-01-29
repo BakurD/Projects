@@ -1,0 +1,75 @@
+---
+
+- name: Install apache2 and my gaywebsite
+  hosts: all
+  become: yes
+  vars:
+   source_folder: ./MyGayWebsite
+   destin_folder: /var/www/html
+
+
+  tasks:
+  - name: Ping sites
+    ping:
+  - name: Unregistred
+    shell: echo This server {{ inventory_hostname }} was deregistory from our Load Balance, node name is {{ ansible_nodename }} >>  /home/bakur/Desctop/log.txt
+    delegate_to: 127.0.0.1
+
+  - name: Check what LINIX on PC
+    debug: var=ansible_os_family
+
+  - block: #=== Block for debian===
+      - name: install apache2 for debian
+        apt: name=apache2 state=latest
+
+      - name: start web servers on debian
+        service: name=apache2 state=started enabled=yes
+
+    when: ansible_os_family == "Debian"
+
+  - block: #=== Block for redhat===
+      - name: install httpd for redhat
+        yum: name=httpd state=latest
+
+      - name: start web service oh redhat
+        service: name=httpd state=started enabled=yes
+
+    when: ansible_os_family == "RedHat"
+
+  - name: Generate INDEX.HTML
+    template: src={{ source_folder }}/index.j2 dest={{ destin_folder }}/index.html mode=0555
+    notify:
+        - Restart Apache2
+        - Restart HTTPD
+
+  - include: create_folder.yml
+    delegate_to: linux2
+# THIS COMMANDS IF COPY FILE
+#  - name: copy homepage to servers
+#    copy: src={{ source_folder }}/{{ item }}  dest={{ destin_folder }} mode=0555
+#    loop:
+#       - "index.html"
+#    notify:
+#        - Restart Apache2
+#        - Restart HTTPD
+  - name: Reboot servers
+    shell: sleep 3 && reboot now
+    async: 1
+    poll: 0
+  - name: Wait when my servers will cum out
+    wait_for:
+        host: "{{ inventory_hostname }}"
+        state: started
+        delay: 5
+        timeout: 40
+    delegate_to: 127.0.0.1
+
+
+  handlers:
+  - name: Restart Apache2
+    service: name=apache2 state=restarted
+    when: ansible_os_family == "Debian"
+
+  - name: Restart HTTPD
+    service: name=httpd state=restarted
+    when: ansible_os_family == "RedHat"

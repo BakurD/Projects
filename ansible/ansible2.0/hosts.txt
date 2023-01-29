@@ -1,0 +1,5 @@
+[Ubuntu]
+
+[Amazon]
+linux1 ansible_host=13.39.23.242 owner=Amazon_Bakur
+linux2 ansible_host=35.180.113.207 owner=One_more
